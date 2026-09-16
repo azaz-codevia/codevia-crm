@@ -1,4 +1,3 @@
-import type postgres from "postgres";
 import { db } from "@/lib/db";
 import { hashApiKey } from "@/lib/api-keys";
 import { isSource } from "@/lib/constants";
@@ -94,7 +93,7 @@ export async function POST(request: Request) {
 
   const log = (outcome: string, payload: unknown, clientId: string | null, error: string | null) =>
     sql`insert into webhook_logs (api_key_id, outcome, client_id, payload, error, ip)
-        values (${apiKey.id}, ${outcome}, ${clientId}, ${payload == null ? null : sql.json(payload as postgres.JSONValue)}, ${error}, ${ip})`;
+        values (${apiKey.id}, ${outcome}, ${clientId}, ${payload == null ? null : sql.json(payload)}, ${error}, ${ip})`;
 
   const body = await readBody(request);
   if (!body) {
@@ -119,7 +118,7 @@ export async function POST(request: Request) {
   return json(request, result, status);
 }
 
-type Logger = (outcome: string, payload: unknown, clientId: string | null, error: string | null) => Promise<unknown>;
+type Logger = (outcome: string, payload: unknown, clientId: string | null, error: string | null) => PromiseLike<unknown> & { catch(fn: (e: unknown) => unknown): unknown };
 
 async function processOne(body: Record<string, unknown>, apiKey: { id: string; default_source: string }, ip: string | null, log: Logger) {
   // Honeypot fields commonly used by forms: bots fill them, humans never see them

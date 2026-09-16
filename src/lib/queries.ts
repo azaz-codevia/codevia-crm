@@ -1,5 +1,4 @@
-import type postgres from "postgres";
-import { db } from "./db";
+import { db, type Fragment, type Sql } from "./db";
 import { isPriority, isSource, isStatus, OPEN_STATUSES, PAGE_SIZE, SERVICES, type Status } from "./constants";
 import { clampInt } from "./utils";
 
@@ -56,8 +55,8 @@ export const SORTS: Record<string, string> = {
   name: "coalesce(c.company_name, c.contact_name) asc",
 };
 
-export function clientWhere(sql: postgres.Sql<Record<string, never>>, f: ClientFilters) {
-  const parts: postgres.PendingQuery<postgres.Row[]>[] = [];
+export function clientWhere(sql: Sql, f: ClientFilters) {
+  const parts: Fragment[] = [];
   const q = f.q?.trim();
   if (q) {
     const like = `%${q.replace(/[%_\\]/g, "\\$&")}%`;
@@ -183,7 +182,7 @@ export async function getClientRelated(id: string) {
 
 // ── Meetings & tasks ────────────────────────────────────────────────────
 
-function meetingSelect(sql: postgres.Sql<Record<string, never>>, where: postgres.PendingQuery<postgres.Row[]>, order: postgres.PendingQuery<postgres.Row[]>) {
+function meetingSelect(sql: Sql, where: Fragment, order: Fragment) {
   return sql<MeetingRow[]>`
     select m.id, m.title, m.description, m.location, m.meeting_url, m.starts_at, m.ends_at, m.status,
            m.client_id, coalesce(c.company_name, c.contact_name) as client_name,
@@ -195,7 +194,7 @@ function meetingSelect(sql: postgres.Sql<Record<string, never>>, where: postgres
     order by ${order}`;
 }
 
-function taskSelect(sql: postgres.Sql<Record<string, never>>, where: postgres.PendingQuery<postgres.Row[]>, order: postgres.PendingQuery<postgres.Row[]>) {
+function taskSelect(sql: Sql, where: Fragment, order: Fragment) {
   return sql<TaskRow[]>`
     select t.id, t.title, t.due_at, t.priority, t.completed_at, t.client_id,
            coalesce(c.company_name, c.contact_name) as client_name, t.assignee_id, u.name as assignee_name

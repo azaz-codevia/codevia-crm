@@ -64,7 +64,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
       <nav className="-mx-4 mb-5 overflow-x-auto px-4 sm:mx-0 sm:px-0" aria-label={ts.title}>
         <div className="inline-flex gap-1 rounded-full bg-panel p-1 ring-1 ring-inset ring-line">
           {TABS.map((k) => (
-            <Link
+            <Link prefetch={false}
               key={k}
               href={k === "profile" ? "/settings" : `/settings?tab=${k}`}
               aria-current={tab === k ? "page" : undefined}

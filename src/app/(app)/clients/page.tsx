@@ -69,8 +69,8 @@ export default async function ClientsPage({ searchParams }: { searchParams: Prom
         <nav className="mt-4 flex items-center justify-between text-sm text-muted">
           <span>{fmt(t.common.page, { page, total: pages })}</span>
           <div className="flex gap-2">
-            {page > 1 && <Link className={buttonClass("secondary", "sm")} href={qs(page - 1)}>{t.common.previous}</Link>}
-            {page < pages && <Link className={buttonClass("secondary", "sm")} href={qs(page + 1)}>{t.common.next}</Link>}
+            {page > 1 && <Link prefetch={false} className={buttonClass("secondary", "sm")} href={qs(page - 1)}>{t.common.previous}</Link>}
+            {page < pages && <Link prefetch={false} className={buttonClass("secondary", "sm")} href={qs(page + 1)}>{t.common.next}</Link>}
           </div>
         </nav>
       )}

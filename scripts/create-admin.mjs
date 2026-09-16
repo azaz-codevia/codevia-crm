@@ -4,7 +4,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import postgres from "postgres";
+import pg from "pg";
 import bcrypt from "bcryptjs";
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -24,18 +24,21 @@ if (!email || !name || !password || password.length < 8) {
 }
 
 const url = process.env.DIRECT_DATABASE_URL || process.env.DATABASE_URL;
-const sql = postgres(url, { prepare: false, max: 1, ssl: /localhost|127\.0\.0\.1/.test(url) ? false : "require" });
+const u = new URL(url);
+u.searchParams.delete("sslmode");
+const client = new pg.Client({ connectionString: u.toString(), ssl: /localhost|127\.0\.0\.1/.test(url) ? false : { rejectUnauthorized: false } });
+await client.connect();
 const hash = await bcrypt.hash(password, 12);
 
 try {
-  const [existing] = await sql`select id from users where lower(email) = lower(${email})`;
+  const { rows: [existing] } = await client.query("select id from users where lower(email) = lower($1)", [email]);
   if (existing) {
-    await sql`update users set password_hash = ${hash}, role = 'admin', is_active = true, name = ${name} where id = ${existing.id}`;
+    await client.query("update users set password_hash = $1, role = 'admin', is_active = true, name = $2 where id = $3", [hash, name, existing.id]);
     console.log("✔ Existing user promoted to admin and password reset");
   } else {
-    await sql`insert into users (name, email, password_hash, role) values (${name}, ${email.toLowerCase()}, ${hash}, 'admin')`;
+    await client.query("insert into users (name, email, password_hash, role) values ($1, $2, $3, 'admin')", [name, email.toLowerCase(), hash]);
     console.log("✔ Admin created");
   }
 } finally {
-  await sql.end();
+  await client.end();
 }

@@ -42,7 +42,7 @@ export function ClientForm({
       {state?.error === "duplicate" && state.duplicateId && (
         <div role="alert" className="flex flex-wrap items-center gap-3 rounded-2xl bg-warn/10 px-4 py-3 text-sm text-warn ring-1 ring-inset ring-warn/30">
           <span>{tc.duplicateWarning}</span>
-          <Link href={`/clients/${state.duplicateId}`} className="font-medium underline underline-offset-4">{tc.openExisting}</Link>
+          <Link prefetch={false} href={`/clients/${state.duplicateId}`} className="font-medium underline underline-offset-4">{tc.openExisting}</Link>
           <input type="hidden" name="ignore_duplicate" value="1" />
           <span className="w-full text-warn/80">{tc.duplicateSaveAnyway}</span>
         </div>

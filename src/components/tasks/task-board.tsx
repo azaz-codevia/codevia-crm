@@ -96,12 +96,12 @@ export function TaskBoard({ tasks, team, currentUserId, scope, showDone, today }
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex rounded-full bg-panel p-1 ring-1 ring-inset ring-line">
           {(["mine", "all"] as const).map((s) => (
-            <Link key={s} href={href({ scope: s })} className={cn("rounded-full px-3 py-1 text-sm", scope === s ? "bg-raised text-fg" : "text-muted hover:text-fg")}>
+            <Link prefetch={false} key={s} href={href({ scope: s })} className={cn("rounded-full px-3 py-1 text-sm", scope === s ? "bg-raised text-fg" : "text-muted hover:text-fg")}>
               {s === "mine" ? tt.mine : tt.everyone}
             </Link>
           ))}
         </div>
-        <Link
+        <Link prefetch={false}
           href={href({ done: !showDone })}
           className={cn("ms-auto inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm ring-1 ring-inset", showDone ? "text-fg ring-lime/50" : "text-muted ring-line")}
           aria-pressed={showDone}
@@ -159,7 +159,7 @@ export function TaskBoard({ tasks, team, currentUserId, scope, showDone, today }
                           </span>
                         )}
                         {task.client_id && task.client_name && (
-                          <Link href={`/clients/${task.client_id}`} className="truncate text-soft hover:text-lime">
+                          <Link prefetch={false} href={`/clients/${task.client_id}`} className="truncate text-soft hover:text-lime">
                             {task.client_name}
                           </Link>
                         )}

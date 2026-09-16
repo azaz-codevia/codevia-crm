@@ -40,7 +40,7 @@ export function LinkButton({
   className,
   ...props
 }: React.ComponentProps<typeof Link> & { variant?: ButtonVariant; size?: ButtonSize }) {
-  return <Link className={buttonClass(variant, size, className)} {...props} />;
+  return <Link prefetch={false} className={buttonClass(variant, size, className)} {...props} />;
 }
 
 const control =

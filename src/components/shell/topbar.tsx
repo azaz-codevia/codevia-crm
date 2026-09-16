@@ -36,7 +36,7 @@ export function Topbar({ user }: { user: { name: string; email: string } }) {
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
       <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-3 px-4 sm:px-6 lg:px-8">
-        <Link href="/dashboard" className="lg:hidden" aria-label="Codevia CRM">
+        <Link prefetch={false} href="/dashboard" className="lg:hidden" aria-label="Codevia CRM">
           <Logo compact />
         </Link>
         <form
@@ -79,10 +79,10 @@ export function Topbar({ user }: { user: { name: string; email: string } }) {
                   <p className="truncate text-xs text-muted" dir="ltr">{user.email}</p>
                 </div>
                 <div className="my-1 h-px bg-line" />
-                <Link role="menuitem" href="/import" onClick={() => setOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-soft hover:bg-panel hover:text-fg lg:hidden">
+                <Link prefetch={false} role="menuitem" href="/import" onClick={() => setOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-soft hover:bg-panel hover:text-fg lg:hidden">
                   <FileSpreadsheet className="h-4 w-4" aria-hidden /> {t.nav.import}
                 </Link>
-                <Link role="menuitem" href="/settings" onClick={() => setOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-soft hover:bg-panel hover:text-fg">
+                <Link prefetch={false} role="menuitem" href="/settings" onClick={() => setOpen(false)} className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-soft hover:bg-panel hover:text-fg">
                   <Settings className="h-4 w-4" aria-hidden /> {t.nav.settings}
                 </Link>
                 <LanguageToggle className="mx-1 my-1 w-[calc(100%-0.5rem)] justify-start ring-0 sm:hidden" />

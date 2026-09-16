@@ -2,11 +2,11 @@
 
 Bilingual (English / العربية with full RTL) CRM for **codevia.sa** — leads from the discovery form, Excel imports, pipeline, client notes, meetings with an iPhone-subscribable calendar, tasks and a stats dashboard.
 
-**Stack:** Next.js 16 (App Router, Server Actions) · React 19 · Tailwind CSS 4 · Supabase Postgres (raw SQL via `postgres`) · deploys to Vercel as-is.
+**Stack:** Next.js 16 (App Router, Server Actions) · React 19 · Tailwind CSS 4 · Supabase Postgres (raw SQL via `pg` + Vercel `attachDatabasePool`) · deploys to Vercel as-is.
 
 ---
 
-## What's inside the file
+## What's inside
 
 | Module | What it does |
 |---|---|
@@ -98,6 +98,12 @@ A hidden honeypot field named `_gotcha` that bots fill in gets the lead rejected
 ## 4. Calendar on iPhone
 
 **Calendar → Subscribe on iPhone** (or Settings → Calendar feed) → **Open on this iPhone** → Subscribe. Or iPhone Settings → Calendar → Accounts → Add Account → Other → *Add Subscribed Calendar* and paste the link. iOS refreshes subscribed calendars on its own schedule (usually within 15 min–1 h). Anyone with the link can read meetings — use **Reset link** if it leaks.
+
+## Performance notes
+
+- `vercel.json` pins functions to Tokyo (`hnd1`), next to the Supabase project (`ap-northeast-1`). If you ever move the database, change the region to match.
+- Database connections use `pg` with Vercel's `attachDatabasePool`, which closes idle connections before an instance is frozen, so no request reuses a dead socket.
+- Links don't pre-load pages (every page is dynamic and hits the database), so one click renders one page.
 
 ## Local development
 

@@ -1,4 +1,4 @@
-import type postgres from "postgres";
+import type { Sql } from "./db";
 import { isPriority, isSource, isStatus, SERVICES, type Service, type Source, type Status } from "./constants";
 import { normalizePhone } from "./utils";
 
@@ -199,7 +199,7 @@ export function hasIdentity(l: LeadInput) {
   return Boolean(l.company_name || l.contact_name || l.email || l.phone);
 }
 
-type Tx = postgres.Sql<Record<string, never>> | postgres.TransactionSql<Record<string, never>>;
+type Tx = Sql;
 
 export async function findDuplicate(sql: Tx, lead: Pick<LeadInput, "email" | "phone">) {
   const phone = normalizePhone(lead.phone);
@@ -255,11 +255,11 @@ export async function upsertLead(sql: Tx, lead: LeadInput, opts: UpsertOptions) 
         utm_campaign     = coalesce(utm_campaign, ${lead.utm_campaign}),
         preferred_language = coalesce(preferred_language, ${lead.preferred_language}),
         tags             = (select array(select distinct unnest(tags || ${lead.tags}::text[]))),
-        discovery        = ${fresh ? sql`discovery || ${sql.json(lead.discovery as postgres.JSONValue)}` : sql`${sql.json(lead.discovery as postgres.JSONValue)} || discovery`}
+        discovery        = ${fresh ? sql`discovery || ${sql.json(lead.discovery)}` : sql`${sql.json(lead.discovery)} || discovery`}
       where id = ${existing.id}`;
     if (opts.activityType === "webhook") {
       await sql`insert into activities (client_id, user_id, type, data)
-        values (${existing.id}, null, 'resubmitted', ${sql.json({ source: opts.source, ...(opts.activityData ?? {}) } as postgres.JSONValue)})`;
+        values (${existing.id}, null, 'resubmitted', ${sql.json({ source: opts.source, ...(opts.activityData ?? {}) })})`;
     }
     return { outcome: "updated" as const, id: existing.id };
   }
@@ -275,11 +275,11 @@ export async function upsertLead(sql: Tx, lead: LeadInput, opts: UpsertOptions) 
       ${lead.services}::text[], ${lead.budget_range}, ${lead.timeline}, ${lead.requirements},
       ${lead.status ?? opts.defaultStatus ?? "new"}, ${lead.priority ?? "medium"}, ${lead.lead_score}, ${lead.deal_value},
       ${lead.source ?? opts.source}, ${lead.utm_source}, ${lead.utm_medium}, ${lead.utm_campaign}, ${lead.preferred_language},
-      ${lead.tags}::text[], ${sql.json(lead.discovery as postgres.JSONValue)}, ${opts.ownerId ?? null}, ${opts.userId}
+      ${lead.tags}::text[], ${sql.json(lead.discovery)}, ${opts.ownerId ?? null}, ${opts.userId}
     ) returning id`;
 
   await sql`insert into activities (client_id, user_id, type, data)
-    values (${row.id}, ${opts.userId}, ${opts.activityType}, ${sql.json({ source: lead.source ?? opts.source, ...(opts.activityData ?? {}) } as postgres.JSONValue)})`;
+    values (${row.id}, ${opts.userId}, ${opts.activityType}, ${sql.json({ source: lead.source ?? opts.source, ...(opts.activityData ?? {}) })})`;
 
   return { outcome: "created" as const, id: row.id };
 }
