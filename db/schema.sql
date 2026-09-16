@@ -200,3 +200,12 @@ alter table tasks           enable row level security;
 alter table api_keys        enable row level security;
 alter table webhook_logs    enable row level security;
 alter table import_batches  enable row level security;
+
+-- Safety net for serverless: end sessions left "idle in transaction" (e.g. a frozen function)
+-- so they can never hold locks and block every other request.
+do $$
+begin
+  execute format('alter role %I set idle_in_transaction_session_timeout = %L', current_user, '30s');
+exception when others then
+  raise notice 'Could not set idle_in_transaction_session_timeout: %', sqlerrm;
+end $$;

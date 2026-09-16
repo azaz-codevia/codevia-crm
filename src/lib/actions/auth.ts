@@ -52,15 +52,13 @@ export async function setupFirstAdmin(_: FormState, formData: FormData): Promise
 
   const sql = db();
   const hash = await bcrypt.hash(password, 12);
-  const created = await sql.begin(async (tx) => {
-    // Serialise concurrent setup attempts
-    await tx`select pg_advisory_xact_lock(424242)`;
-    const [{ count }] = await tx<{ count: number }[]>`select count(*)::int as count from users`;
-    if (count > 0) return null;
-    const [u] = await tx<{ id: string }[]>`
-      insert into users (name, email, password_hash, role) values (${name}, ${email}, ${hash}, 'admin') returning id`;
-    return u;
-  });
+  // Single atomic statement: only inserts while the users table is still empty.
+  // (No explicit transaction or advisory lock — those can get stuck behind Supabase's transaction pooler.)
+  const [created] = await sql<{ id: string }[]>`
+    insert into users (name, email, password_hash, role)
+    select ${name}, ${email}, ${hash}, 'admin'
+    where not exists (select 1 from users)
+    returning id`;
   if (!created) return { error: "done" };
   await startSession(created.id, "admin");
   redirect("/dashboard");

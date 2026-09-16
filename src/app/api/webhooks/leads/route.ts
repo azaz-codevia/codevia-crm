@@ -134,9 +134,7 @@ async function processOne(body: Record<string, unknown>, apiKey: { id: string; d
       return { ok: false as const, error: "missing_identity", message: "Send at least one of company, name, email or phone." };
     }
     const source = isSource(apiKey.default_source) ? apiKey.default_source : "discovery";
-    const result = await db().begin((tx) =>
-      upsertLead(tx, lead, { userId: null, source, onDuplicate: "fill", activityType: "webhook", activityData: { ip } }),
-    );
+    const result = await upsertLead(db(), lead, { userId: null, source, onDuplicate: "fill", activityType: "webhook", activityData: { ip } });
     const outcome = result.outcome === "skipped" ? ("updated" as const) : result.outcome;
     await log(outcome, body, result.id, null);
     return { ok: true as const, id: result.id, outcome };

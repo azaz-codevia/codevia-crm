@@ -80,8 +80,9 @@ export async function createClient(_: FormState, fd: FormData): Promise<FormStat
   }
 
   const lead: LeadInput = { ...normalizeLead({}), ...c, discovery: {} };
-  const id = await sql.begin(async (tx) => {
-    const res = await upsertLead(tx as never, lead, {
+  // No explicit transactions: they're fragile through Supabase's transaction pooler on serverless.
+  const id = await (async (tx) => {
+    const res = await upsertLead(tx, lead, {
       userId: user.id,
       source: c.source,
       ownerId: c.owner_id ?? user.id,
@@ -91,7 +92,7 @@ export async function createClient(_: FormState, fd: FormData): Promise<FormStat
     await tx`update clients set lost_reason = ${c.lost_reason}, next_follow_up_at = ${c.next_follow_up_at},
       won_at = ${c.status === "won" ? new Date() : null} where id = ${res.id}`;
     return res.id;
-  });
+  })(sql);
   revalidatePath("/clients");
   revalidatePath("/dashboard");
   redirect(`/clients/${id}`);
@@ -104,8 +105,8 @@ export async function updateClient(id: string, _: FormState, fd: FormData): Prom
   if (!c.company_name && !c.contact_name) return { error: "required" };
 
   const sql = db();
-  await sql.begin(async (tx) => {
-    const [before] = await tx<{ status: Status; owner_id: string | null }[]>`select status, owner_id from clients where id = ${id} for update`;
+  await (async (tx) => {
+    const [before] = await tx<{ status: Status; owner_id: string | null }[]>`select status, owner_id from clients where id = ${id}`;
     if (!before) return;
     await tx`
       update clients set
@@ -129,7 +130,7 @@ export async function updateClient(id: string, _: FormState, fd: FormData): Prom
       await tx`insert into activities (client_id, user_id, type, data)
         values (${id}, ${user.id}, 'assigned', ${tx.json(json({ owner_id: c.owner_id }))})`;
     }
-  });
+  })(sql);
   revalidatePath("/clients");
   revalidatePath(`/clients/${id}`);
   redirect(`/clients/${id}`);
@@ -141,9 +142,9 @@ export async function setClientStatus(ids: string[], status: string) {
   const valid = ids.filter((i) => UUID.test(i)).slice(0, 500);
   if (!valid.length) return { ok: true };
   const sql = db();
-  await sql.begin(async (tx) => {
+  await (async (tx) => {
     const changed = await tx<{ id: string; from: string }[]>`
-      with prev as (select id, status from clients where id = any(${valid}::uuid[]) and status <> ${status} for update)
+      with prev as (select id, status from clients where id = any(${valid}::uuid[]) and status <> ${status})
       update clients c set status = ${status},
         won_at = case when ${status} = 'won' then now() else null end
       from prev where c.id = prev.id
@@ -152,7 +153,7 @@ export async function setClientStatus(ids: string[], status: string) {
       await tx`insert into activities (client_id, user_id, type, data)
         values (${row.id}, ${user.id}, 'status_changed', ${tx.json(json({ from: row.from, to: status }))})`;
     }
-  });
+  })(sql);
   revalidatePath("/clients");
   revalidatePath("/pipeline");
   revalidatePath("/dashboard");
@@ -165,14 +166,14 @@ export async function assignClients(ids: string[], ownerId: string | null) {
   const valid = ids.filter((i) => UUID.test(i)).slice(0, 500);
   const owner = ownerId && UUID.test(ownerId) ? ownerId : null;
   const sql = db();
-  await sql.begin(async (tx) => {
+  await (async (tx) => {
     await tx`update clients set owner_id = ${owner} where id = any(${valid}::uuid[])`;
     if (owner) {
       for (const id of valid) {
         await tx`insert into activities (client_id, user_id, type, data) values (${id}, ${user.id}, 'assigned', ${tx.json(json({ owner_id: owner }))})`;
       }
     }
-  });
+  })(sql);
   revalidatePath("/clients");
   revalidatePath("/dashboard");
   return { ok: true };
