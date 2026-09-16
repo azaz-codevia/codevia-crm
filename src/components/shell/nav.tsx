@@ -28,7 +28,7 @@ export function Sidebar({ user }: { user: { name: string; role: string } }) {
   return (
     <aside className="sticky top-0 hidden h-dvh flex-col overflow-hidden border-e border-line bg-canvas lg:flex">
       <div className="px-6 pt-6 pb-8">
-        <Link href="/dashboard" aria-label="Codevia CRM">
+        <Link prefetch={false} href="/dashboard" aria-label="Codevia CRM">
           <Logo />
         </Link>
       </div>
@@ -36,7 +36,7 @@ export function Sidebar({ user }: { user: { name: string; role: string } }) {
         {ITEMS.map(({ href, key, icon: Icon }) => {
           const active = isActive(href);
           return (
-            <Link
+            <Link prefetch={false}
               key={href}
               href={href}
               aria-current={active ? "page" : undefined}
@@ -82,7 +82,7 @@ export function MobileTabBar() {
           const active = isActive(href);
           return (
             <li key={href}>
-              <Link
+              <Link prefetch={false}
                 href={href}
                 aria-current={active ? "page" : undefined}
                 className={cn("flex flex-col items-center gap-1 py-2.5 text-[11px]", active ? "text-lime" : "text-muted")}

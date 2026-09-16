@@ -3,7 +3,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import postgres from "postgres";
+import pg from "pg";
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 loadEnv(path.join(root, ".env.local"));
@@ -15,17 +15,20 @@ if (!url) {
   process.exit(1);
 }
 
-const sql = postgres(url, { prepare: false, max: 1, ssl: needsSsl(url) ? "require" : false, onnotice: () => {} });
+const u = new URL(url);
+u.searchParams.delete("sslmode");
+const client = new pg.Client({ connectionString: u.toString(), ssl: needsSsl(url) ? { rejectUnauthorized: false } : false });
+await client.connect();
 const schema = readFileSync(path.join(root, "db", "schema.sql"), "utf8");
 
 try {
-  await sql.unsafe(schema);
+  await client.query(schema);
   console.log("✔ Schema applied");
 } catch (err) {
   console.error("✖ Migration failed:", err.message);
   process.exitCode = 1;
 } finally {
-  await sql.end();
+  await client.end();
 }
 
 function needsSsl(u) {

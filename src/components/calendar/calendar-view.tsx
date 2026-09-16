@@ -149,16 +149,16 @@ export function CalendarView(p: Props) {
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <div className="flex items-center gap-1">
-          <Link href={href({ month: p.prevMonth })} className={buttonClass("secondary", "icon")} aria-label={t.common.previous}>
+          <Link prefetch={false} href={href({ month: p.prevMonth })} className={buttonClass("secondary", "icon")} aria-label={t.common.previous}>
             <Prev className="h-4 w-4" />
           </Link>
-          <Link href={href({ month: p.nextMonth })} className={buttonClass("secondary", "icon")} aria-label={t.common.next}>
+          <Link prefetch={false} href={href({ month: p.nextMonth })} className={buttonClass("secondary", "icon")} aria-label={t.common.next}>
             <Next className="h-4 w-4" />
           </Link>
         </div>
         <h2 className="min-w-36 px-1 text-lg font-medium">{monthLabel}</h2>
         {p.month !== p.todayMonth && (
-          <Link href={href({ month: p.todayMonth })} className={buttonClass("ghost", "sm")}>
+          <Link prefetch={false} href={href({ month: p.todayMonth })} className={buttonClass("ghost", "sm")}>
             {t.common.today}
           </Link>
         )}
@@ -170,7 +170,7 @@ export function CalendarView(p: Props) {
           </Select>
           <div className="hidden rounded-full bg-panel p-1 ring-1 ring-inset ring-line md:flex">
             {(["month", "agenda"] as const).map((v) => (
-              <Link
+              <Link prefetch={false}
                 key={v}
                 href={href({ view: v })}
                 className={cn("rounded-full px-3 py-1 text-sm", p.view === v ? "bg-raised text-fg" : "text-muted hover:text-fg")}
@@ -304,7 +304,7 @@ export function CalendarView(p: Props) {
         </Card>
       </div>
       <div className="mt-3 flex justify-center md:hidden">
-        <Link href={href({ view: p.view === "agenda" ? "month" : "agenda" })} className={buttonClass("ghost", "sm")}>
+        <Link prefetch={false} href={href({ view: p.view === "agenda" ? "month" : "agenda" })} className={buttonClass("ghost", "sm")}>
           {p.view === "agenda" ? tc.month : tc.agenda}
         </Link>
       </div>

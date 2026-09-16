@@ -82,7 +82,7 @@ export default async function ClientPage({ params }: { params: Promise<{ id: str
 
   return (
     <div>
-      <Link href="/clients" className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted hover:text-fg">
+      <Link prefetch={false} href="/clients" className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted hover:text-fg">
         <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden /> {t.nav.clients}
       </Link>
 

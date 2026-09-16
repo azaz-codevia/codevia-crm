@@ -108,7 +108,7 @@ export function ClientsTable({ rows, team, canDelete }: { rows: ClientRow[]; tea
                     <input type="checkbox" aria-label="Select" checked={selected.has(c.id)} onChange={() => toggle(c.id)} className="accent-lime" />
                   </td>
                   <td className="max-w-64 px-3 py-3">
-                    <Link href={`/clients/${c.id}`} className="block hover:text-lime">
+                    <Link prefetch={false} href={`/clients/${c.id}`} className="block hover:text-lime">
                       <span className="block truncate font-medium">{c.company_name ?? c.contact_name ?? "—"}</span>
                       <span className="block truncate text-xs text-muted">
                         {c.company_name ? c.contact_name : c.email}
@@ -162,7 +162,7 @@ export function ClientsTable({ rows, team, canDelete }: { rows: ClientRow[]; tea
           return (
             <li key={c.id} className="flex items-start gap-3 px-4 py-3.5">
               <input type="checkbox" aria-label="Select" checked={selected.has(c.id)} onChange={() => toggle(c.id)} className="mt-1 accent-lime" />
-              <Link href={`/clients/${c.id}`} className="min-w-0 flex-1">
+              <Link prefetch={false} href={`/clients/${c.id}`} className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-2">
                   <p className="truncate font-medium">{c.company_name ?? c.contact_name ?? "—"}</p>
                   <Badge tone={STATUS_TONE[c.status]}>{t.status[c.status]}</Badge>

@@ -35,7 +35,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         </div>
         <nav className="flex rounded-full bg-panel p-1 ring-1 ring-inset ring-line" aria-label="Range">
           {ranges.map((r) => (
-            <Link
+            <Link prefetch={false}
               key={r.v}
               href={`/dashboard?range=${r.v}`}
               aria-current={range === r.v ? "true" : undefined}
@@ -103,7 +103,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           </div>
         </Card>
         <Card>
-          <CardTitle action={<Link href="/pipeline" className="text-xs text-muted hover:text-lime">{t.nav.pipeline}</Link>}>{td.byStage}</CardTitle>
+          <CardTitle action={<Link prefetch={false} href="/pipeline" className="text-xs text-muted hover:text-lime">{t.nav.pipeline}</Link>}>{td.byStage}</CardTitle>
           <div className="px-5 pb-5">
             <StageDonut data={d.byStage} />
           </div>
@@ -143,7 +143,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       {/* Work lists */}
       <section className="grid gap-4 lg:grid-cols-3">
         <Card>
-          <CardTitle action={<Link href="/calendar" className="text-xs text-muted hover:text-lime">{t.nav.calendar}</Link>}>{td.upcoming}</CardTitle>
+          <CardTitle action={<Link prefetch={false} href="/calendar" className="text-xs text-muted hover:text-lime">{t.nav.calendar}</Link>}>{td.upcoming}</CardTitle>
           {d.upcoming.length === 0 ? (
             <EmptyState>{t.calendar.noMeetings}</EmptyState>
           ) : (
@@ -168,7 +168,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         </Card>
 
         <Card>
-          <CardTitle action={<Link href="/tasks" className="text-xs text-muted hover:text-lime">{t.nav.tasks}</Link>}>{td.dueTasks}</CardTitle>
+          <CardTitle action={<Link prefetch={false} href="/tasks" className="text-xs text-muted hover:text-lime">{t.nav.tasks}</Link>}>{td.dueTasks}</CardTitle>
           {d.dueTasks.length === 0 ? (
             <EmptyState>{t.tasks.empty}</EmptyState>
           ) : (
@@ -183,7 +183,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                       {task.client_name && task.client_id && (
                         <>
                           {" · "}
-                          <Link href={`/clients/${task.client_id}`} className="hover:text-lime">{task.client_name}</Link>
+                          <Link prefetch={false} href={`/clients/${task.client_id}`} className="hover:text-lime">{task.client_name}</Link>
                         </>
                       )}
                     </p>
@@ -195,14 +195,14 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         </Card>
 
         <Card>
-          <CardTitle action={<Link href="/clients" className="text-xs text-muted hover:text-lime">{t.nav.clients}</Link>}>{td.recentLeads}</CardTitle>
+          <CardTitle action={<Link prefetch={false} href="/clients" className="text-xs text-muted hover:text-lime">{t.nav.clients}</Link>}>{td.recentLeads}</CardTitle>
           {d.recent.length === 0 ? (
             <EmptyState action={<LinkButton href="/import" size="sm">{t.nav.import}</LinkButton>}>{t.clients.emptyAll}</EmptyState>
           ) : (
             <ul className="divide-y divide-line px-5 pb-2">
               {d.recent.map((c) => (
                 <li key={c.id}>
-                  <Link href={`/clients/${c.id}`} className="flex items-center gap-3 py-3 hover:text-lime">
+                  <Link prefetch={false} href={`/clients/${c.id}`} className="flex items-center gap-3 py-3 hover:text-lime">
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium">{c.company_name ?? c.contact_name ?? "—"}</p>
                       <p className="truncate text-xs text-muted">
@@ -237,7 +237,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
               {d.team.map((m) => (
                 <tr key={m.id} className="border-t border-line">
                   <td className="px-3 py-2.5">
-                    <Link href={`/clients?owner=${m.id}`} className="flex items-center gap-2.5 hover:text-lime">
+                    <Link prefetch={false} href={`/clients?owner=${m.id}`} className="flex items-center gap-2.5 hover:text-lime">
                       <Avatar name={m.name} className="h-7 w-7 text-[10px]" />
                       {m.name}
                     </Link>
@@ -272,7 +272,7 @@ function Kpi({
   children?: React.ReactNode;
 }) {
   return (
-    <Link href={href} className="group">
+    <Link prefetch={false} href={href} className="group">
       <Card className="flex h-full flex-col justify-between gap-3 p-4 transition-colors group-hover:ring-line-strong md:p-5">
         <div className="flex items-start justify-between gap-2">
           <p className="text-[13px] leading-snug text-muted">{label}</p>

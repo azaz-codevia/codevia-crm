@@ -1,6 +1,5 @@
 "use server";
 
-import type postgres from "postgres";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
@@ -20,7 +19,7 @@ import { normalizePhone, str, zonedInputToUtc } from "@/lib/utils";
 import type { FormState } from "./auth";
 
 const UUID = /^[0-9a-f-]{36}$/i;
-const json = (v: unknown) => v as postgres.JSONValue;
+const json = (v: unknown) => v;
 
 function uuidOrNull(v: FormDataEntryValue | null) {
   const s = str(v);

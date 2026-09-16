@@ -58,7 +58,7 @@ export function KanbanBoard({ cards, team, owner }: { cards: KanbanCard[]; team:
       }}
       className="group cursor-grab rounded-2xl bg-raised p-3.5 ring-1 ring-inset ring-line transition-shadow hover:ring-line-strong active:cursor-grabbing"
     >
-      <Link href={`/clients/${c.id}`} className="block" draggable={false}>
+      <Link prefetch={false} href={`/clients/${c.id}`} className="block" draggable={false}>
         <div className="flex items-start justify-between gap-2">
           <p className="line-clamp-2 text-sm font-medium group-hover:text-lime">{c.title}</p>
           {c.priority === "high" && <span className="tone-high dot-tone mt-1.5 h-2 w-2 shrink-0 rounded-full" title={t.priority.high} />}

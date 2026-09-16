@@ -12,7 +12,7 @@ export default async function SetupPage() {
     return (
       <div className="flex flex-col gap-4">
         <p className="text-soft">{t.auth.setupDone}</p>
-        <Link href="/login" className="text-lime underline underline-offset-4">{t.auth.signIn}</Link>
+        <Link prefetch={false} href="/login" className="text-lime underline underline-offset-4">{t.auth.signIn}</Link>
       </div>
     );
   }
