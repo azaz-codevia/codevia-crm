@@ -6,7 +6,7 @@ Bilingual (English / العربية with full RTL) CRM for **codevia.sa** — le
 
 ---
 
-## What's inside
+## What's inside the file
 
 | Module | What it does |
 |---|---|
